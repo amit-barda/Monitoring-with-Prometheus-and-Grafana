@@ -1,4 +1,10 @@
+# API version for the Kubernetes Namespace resource
 apiVersion: v1
+
+# Define the kind of resource, which is a Namespace
 kind: Namespace
+
+# Metadata section for the Namespace
 metadata:
-  name: monitoring 
+  # Name of the namespace
+  name: monitoring  # This creates a namespace called 'monitoring'
