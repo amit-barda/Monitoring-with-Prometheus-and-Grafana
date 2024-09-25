@@ -1,0 +1,278 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard
+  namespace: monitoring
+data:
+  kubernetes-cluster-monitoring-dashboard.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Kubernetes Cluster Monitoring",
+        "tags": [],
+        "timezone": "browser",
+        "schemaVersion": 32,
+        "version": 1,
+        "templating": {
+          "list": [
+            {
+              "type": "query",
+              "name": "node",
+              "label": "Node",
+              "query": "label_values(node_info, instance)",
+              "datasource": "Prometheus",
+              "refresh": 1
+            },
+            {
+              "type": "query",
+              "name": "namespace",
+              "label": "Namespace",
+              "query": "label_values(kube_namespace_labels, namespace)",
+              "datasource": "Prometheus",
+              "refresh": 1
+            },
+            {
+              "type": "query",
+              "name": "pod",
+              "label": "Pod",
+              "query": "label_values(kube_pod_info, pod)",
+              "datasource": "Prometheus",
+              "refresh": 1
+            },
+            {
+              "type": "query",
+              "name": "container",
+              "label": "Container",
+              "query": "label_values(container_name, container)",
+              "datasource": "Prometheus",
+              "refresh": 1
+            }
+          ]
+        }
+      },
+      "annotations": {
+        "list": []
+      },
+      "panels": [
+        {
+          "title": "Pods Running on Node",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "count(kube_pod_info{node=\"$node\"})",
+              "legendFormat": "{{node}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Node CPU Usage by Cores",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{node=\"$node\"}[5m])) by (core)",
+              "legendFormat": "{{core}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Node CPU Usage by %",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "avg(rate(container_cpu_usage_seconds_total{node=\"$node\"}[5m])) by (instance) * 100",
+              "legendFormat": "{{instance}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace Pod Restarts",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "sum(kube_pod_status_restarts_total{namespace=\"$namespace\"})",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace CPU Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\"}[5m])) by (namespace)",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace Running Pods",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "count(kube_pod_info{namespace=\"$namespace\"})",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace Deployments",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "count(kube_deployment_labels{namespace=\"$namespace\"})",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace Network Traffic (Receive)",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"$namespace\"}[5m])) by (namespace)",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace Network Traffic (Transmit)",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"$namespace\"}[5m])) by (namespace)",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Namespace Memory Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(container_memory_usage_bytes{namespace=\"$namespace\"}) by (namespace)",
+              "legendFormat": "{{namespace}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod Network Traffic (Receive)",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_network_receive_bytes_total{pod=\"$pod\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod Network Traffic (Transmit)",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_network_transmit_bytes_total{pod=\"$pod\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod Disk I/O Read",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_fs_reads_bytes_total{pod=\"$pod\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod Disk I/O Write",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_fs_writes_bytes_total{pod=\"$pod\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod CPU Usage by %",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "avg(rate(container_cpu_usage_seconds_total{pod=\"$pod\"}[5m])) by (pod) * 100",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod Age",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "time() - kube_pod_start_time{pod=\"$pod\"}",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod Average Memory Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "avg(container_memory_usage_bytes{pod=\"$pod\"}) by (pod)",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Pod CPU Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "avg(rate(container_cpu_usage_seconds_total{pod=\"$pod\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Container CPU Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{container=\"$container\"}[5m])) by (container)",
+              "legendFormat": "{{container}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        },
+        {
+          "title": "Container Memory Usage",
+          "type": "graph",
+          "targets": [
+            {
+              "expr": "sum(container_memory_usage_bytes{container=\"$container\"}) by (container)",
+              "legendFormat": "{{container}}",
+              "datasource": "Prometheus"
+            }
+          ]
+        }
+      ]
+    }
