@@ -1,12 +1,25 @@
 # grafana-service.yaml
+# API version for the Kubernetes Service resource
 apiVersion: v1
+
+# Define the kind of resource, which is a Service
 kind: Service
+
+# Metadata section for the Service
 metadata:
+  # Name of the service
   name: grafana
+
+  # Namespace where the Grafana service will be created
   namespace: monitoring
+
+# Specification of the Service
 spec:
+  # Define the ports the Service will expose
   ports:
-    - port: 3000
-      targetPort: 3000
+    - port: 3000  # Port exposed by the Service for external access (Grafana's UI default port)
+      targetPort: 3000  # Port on the Grafana container to route traffic to
+
+  # The selector ensures the Service routes traffic to pods with the label 'app: grafana'
   selector:
     app: grafana
