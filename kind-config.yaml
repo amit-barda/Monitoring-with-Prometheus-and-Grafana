@@ -1,8 +1,22 @@
-kind: Cluster
+# Specify the API version for kind's cluster configuration
 apiVersion: kind.x-k8s.io/v1alpha4
-name: monitoring-cluster
+
+# Define the kind of resource, which is a Kind cluster configuration
+kind: Cluster
+
+# Metadata for the cluster configuration
+name: monitoring-cluster  # Name of the Kubernetes cluster (you can change this to anything)
+
+# Define the nodes in the cluster
 nodes:
-- role: control-plane
-- role: worker
-- role: worker
-- role: worker
+  # The control-plane node (this is the master node that manages the cluster)
+  - role: control-plane
+
+  # First worker node (handles application workloads)
+  - role: worker
+
+  # Second worker node (handles application workloads)
+  - role: worker
+
+  # Third worker node (handles application workloads)
+  - role: worker
