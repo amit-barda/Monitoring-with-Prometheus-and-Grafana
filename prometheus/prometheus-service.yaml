@@ -1,12 +1,28 @@
 # prometheus-service.yaml
+# API version for the Kubernetes Service resource
 apiVersion: v1
+
+# Define the kind of resource, which is a Service
 kind: Service
+
+# Metadata section for the Service
 metadata:
+  # Name of the service
   name: prometheus
+
+  # Namespace where the Prometheus service will be created
   namespace: monitoring
+
+# Specification of the Service
 spec:
+  # Define the ports the Service will expose
   ports:
+    # Port exposed by the Service for external access (Prometheus UI default port)
     - port: 9090
+    
+      # Target port inside the Prometheus container to route traffic to
       targetPort: 9090
+
+  # The selector ensures the Service routes traffic to pods with the label 'app: prometheus'
   selector:
     app: prometheus
