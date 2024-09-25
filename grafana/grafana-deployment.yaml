@@ -1,24 +1,53 @@
 # grafana-deployment.yaml
+# API version for the Kubernetes deployment resource
 apiVersion: apps/v1
+
+# Define the kind of resource, which is a Deployment
 kind: Deployment
+
+# Metadata section for the Deployment
 metadata:
+  # Name of the deployment
   name: grafana
+
+  # Namespace where Grafana will be deployed
   namespace: monitoring
+
+# Specification of the deployment
 spec:
+  # Number of replicas (Grafana instances) to run
   replicas: 1
+
+  # Selector to identify which pods this deployment manages
   selector:
+    # Match the label with 'app: grafana' to manage the correct pods
     matchLabels:
       app: grafana
+
+  # Define the Pod template for the deployment
   template:
+    # Metadata for the pod
     metadata:
+      # Labels that will be applied to the pod
       labels:
         app: grafana
+
+    # Specification of the containers inside the pod
     spec:
+      # Define the container that runs Grafana
       containers:
         - name: grafana
+          
+          # Specify the Grafana Docker image to use
           image: grafana/grafana:9.0.6
+
+          # Define the port exposed by the Grafana container (Grafana's default port is 3000)
           ports:
-            - containerPort: 3000
+            - containerPort: 3000  # Expose port 3000 for Grafana's web UI
+
+          # Environment variables to configure Grafana
           env:
+            # Set the admin password for Grafana
             - name: GF_SECURITY_ADMIN_PASSWORD
-              value: "admin"  # Change this to a more secure password
+              value: "admin"  # Change this to a more secure password in production!
+
