@@ -1,36 +1,75 @@
+# Define the API version for the Kubernetes Deployment resource
 apiVersion: apps/v1
+
+# Specify the kind of resource, which is a Deployment
 kind: Deployment
+
+# Metadata for the Deployment
 metadata:
+  # Name of the Prometheus deployment
   name: prometheus
+  
+  # Namespace where Prometheus will be deployed
   namespace: monitoring
+
+# Specification for the deployment
 spec:
+  # Number of Prometheus pod replicas to run
   replicas: 1
+  
+  # Selector to define which pods this deployment manages
   selector:
+    # Match pods that have the label 'app: prometheus'
     matchLabels:
       app: prometheus
+
+  # Define the template for the pod
   template:
+    # Metadata for the pod
     metadata:
+      # Labels that will be applied to the pod
       labels:
         app: prometheus
-    spec:
-      containers:
-        - name: prometheus
-          image: prom/prometheus:v2.44.0
-          ports:
-            - containerPort: 9090
-          volumeMounts:
-            - name: prometheus-config
-              mountPath: /etc/prometheus/prometheus.yml
-              subPath: prometheus.yml
-          resources:               # Add resource requests and limits
-            requests:
-              cpu: "100m"         # Adjust as needed
-              memory: "128Mi"     # Adjust as needed
-            limits:
-              cpu: "200m"         # Adjust as needed
-              memory: "256Mi"     # Adjust as needed
-      volumes:
-        - name: prometheus-config
-          configMap:
-            name: prometheus-config
 
+    # Specification for the containers within the pod
+    spec:
+      # Container configuration for Prometheus
+      containers:
+        - name: prometheus  # Name of the Prometheus container
+
+          # Prometheus Docker image to use
+          image: prom/prometheus:v2.44.0
+
+          # Define the port that Prometheus will expose (default is 9090)
+          ports:
+            - containerPort: 9090  # Expose Prometheus on port 9090 for web UI and API
+
+          # Volume mount to attach the Prometheus configuration
+          volumeMounts:
+            # Name of the volume defined later in the YAML
+            - name: prometheus-config
+              # Path inside the container where the configuration will be mounted
+              mountPath: /etc/prometheus/prometheus.yml
+              # Use only the `prometheus.yml` file from the ConfigMap
+              subPath: prometheus.yml
+
+          # Define resource requests and limits for Prometheus
+          resources:
+            requests:
+              # Minimum amount of CPU to allocate (100 millicores)
+              cpu: "100m"
+              # Minimum amount of memory to allocate (128MiB)
+              memory: "128Mi"
+            limits:
+              # Maximum amount of CPU Prometheus can use (200 millicores)
+              cpu: "200m"
+              # Maximum amount of memory Prometheus can use (256MiB)
+              memory: "256Mi"
+
+      # Define the volumes used in the container
+      volumes:
+        # Define the Prometheus configuration volume
+        - name: prometheus-config
+          # Mount the configuration from the ConfigMap 'prometheus-config'
+          configMap:
+            name: prometheus-config  # Name of the ConfigMap containing Prometheus configuration
