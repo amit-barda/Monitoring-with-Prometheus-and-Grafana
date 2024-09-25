@@ -1,11 +1,23 @@
 # prometheus-config.yaml
+# prometheus-config.yaml
+# API version for the Kubernetes ConfigMap resource
 apiVersion: v1
+
+# Define the kind of resource, which is a ConfigMap
 kind: ConfigMap
+
+# Metadata section for the ConfigMap
 metadata:
+  # Name of the ConfigMap
   name: prometheus-config
+
+  # Namespace where the Prometheus ConfigMap will be created
   namespace: monitoring
+
+# Data section that contains the Prometheus configuration
 data:
-  prometheus.yml: |
+  # Prometheus configuration file, typically named prometheus.yml
+   prometheus.yml: |
     global:
       scrape_interval: 15s
     scrape_configs:
