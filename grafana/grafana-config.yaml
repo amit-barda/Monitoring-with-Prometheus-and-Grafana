@@ -1,28 +1,61 @@
+# Define the API version and kind for this resource
 apiVersion: v1
 kind: ConfigMap
+
+# Metadata for the ConfigMap
 metadata:
+  # Name of the ConfigMap
   name: grafana-dashboard
+  
+  # Namespace where the ConfigMap will be created
   namespace: monitoring
+
+# Data section containing the Grafana dashboard JSON
 data:
+  # The name of the Grafana dashboard JSON inside the ConfigMap
   kubernetes-cluster-monitoring-dashboard.json: |
+    
+    # Start of the Grafana dashboard JSON
     {
+      # Dashboard metadata and settings
       "dashboard": {
+        # ID for the dashboard (null means it will be assigned by Grafana)
         "id": null,
+
+        # Title of the dashboard
         "title": "Kubernetes Cluster Monitoring",
+
+        # Tags for filtering dashboards
         "tags": [],
+
+        # Use the browser timezone for displaying data
         "timezone": "browser",
+
+        # Schema version for compatibility
         "schemaVersion": 32,
+
+        # Version of the dashboard, useful for tracking changes
         "version": 1,
+
+        # Define dashboard variables (templating)
         "templating": {
           "list": [
+            # Node variable for selecting nodes
             {
+              # Type of variable: Query
               "type": "query",
+              # Variable name
               "name": "node",
+              # Label displayed in Grafana
               "label": "Node",
+              # Prometheus query to fetch the list of nodes
               "query": "label_values(node_info, instance)",
+              # Datasource used for the query
               "datasource": "Prometheus",
+              # How often the variable should refresh
               "refresh": 1
             },
+            # Namespace variable for selecting namespaces
             {
               "type": "query",
               "name": "namespace",
@@ -31,6 +64,7 @@ data:
               "datasource": "Prometheus",
               "refresh": 1
             },
+            # Pod variable for selecting pods
             {
               "type": "query",
               "name": "pod",
@@ -39,6 +73,7 @@ data:
               "datasource": "Prometheus",
               "refresh": 1
             },
+            # Container variable for selecting containers
             {
               "type": "query",
               "name": "container",
@@ -50,21 +85,42 @@ data:
           ]
         }
       },
+
+      # Annotations section for marking specific events in the time series
       "annotations": {
         "list": []
       },
+
+      # Define the individual panels in the dashboard
       "panels": [
+        # Panel for displaying the number of pods running on the selected node
         {
+          # Title of the panel
           "title": "Pods Running on Node",
+
+          # Type of panel (stat for a single value display)
           "type": "stat",
+
+          # Prometheus query to count the number of pods on the node
           "targets": [
             {
               "expr": "count(kube_pod_info{node=\"$node\"})",
               "legendFormat": "{{node}}",
               "datasource": "Prometheus"
             }
-          ]
+          ],
+
+          # Use a background color based on thresholds
+          "colorBackground": true,
+
+          # Define thresholds for changing the background color
+          "thresholds": "0, 10",
+
+          # Colors for the thresholds (green for normal, yellow for warning, red for critical)
+          "colors": ["green", "yellow", "red"]
         },
+
+        # Panel for displaying the CPU usage on the node by core
         {
           "title": "Node CPU Usage by Cores",
           "type": "graph",
@@ -76,6 +132,8 @@ data:
             }
           ]
         },
+
+        # Panel for displaying the CPU usage on the node as a percentage
         {
           "title": "Node CPU Usage by %",
           "type": "graph",
@@ -85,8 +143,16 @@ data:
               "legendFormat": "{{instance}}",
               "datasource": "Prometheus"
             }
-          ]
+          ],
+
+          # Define thresholds for CPU usage percentage
+          "thresholds": "0, 50, 90",
+
+          # Colors for CPU usage thresholds (green for low usage, orange for medium, red for high)
+          "colors": ["green", "orange", "red"]
         },
+
+        # Panel for showing the number of pod restarts in a namespace
         {
           "title": "Namespace Pod Restarts",
           "type": "stat",
@@ -96,8 +162,19 @@ data:
               "legendFormat": "{{namespace}}",
               "datasource": "Prometheus"
             }
-          ]
+          ],
+
+          # Background color based on the number of restarts
+          "colorBackground": true,
+
+          # Thresholds for the number of restarts
+          "thresholds": "0, 10",
+
+          # Colors for restart thresholds
+          "colors": ["green", "yellow", "red"]
         },
+
+        # Panel for showing the CPU usage in a namespace
         {
           "title": "Namespace CPU Usage",
           "type": "graph",
@@ -109,6 +186,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the number of running pods in a namespace
         {
           "title": "Namespace Running Pods",
           "type": "stat",
@@ -120,6 +199,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the number of deployments in a namespace
         {
           "title": "Namespace Deployments",
           "type": "stat",
@@ -131,6 +212,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the network traffic received in a namespace
         {
           "title": "Namespace Network Traffic (Receive)",
           "type": "graph",
@@ -142,6 +225,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the network traffic transmitted in a namespace
         {
           "title": "Namespace Network Traffic (Transmit)",
           "type": "graph",
@@ -153,6 +238,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the memory usage in a namespace
         {
           "title": "Namespace Memory Usage",
           "type": "graph",
@@ -164,6 +251,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the network traffic received by a pod
         {
           "title": "Pod Network Traffic (Receive)",
           "type": "graph",
@@ -175,6 +264,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the network traffic transmitted by a pod
         {
           "title": "Pod Network Traffic (Transmit)",
           "type": "graph",
@@ -186,6 +277,8 @@ data:
             }
           ]
         },
+
+        # Panel for showing the disk I/O reads by a pod
         {
           "title": "Pod Disk I/O Read",
           "type": "graph",
@@ -197,82 +290,11 @@ data:
             }
           ]
         },
+
+        # Panel for showing the disk I/O writes by a pod
         {
           "title": "Pod Disk I/O Write",
           "type": "graph",
           "targets": [
             {
-              "expr": "sum(rate(container_fs_writes_bytes_total{pod=\"$pod\"}[5m])) by (pod)",
-              "legendFormat": "{{pod}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        },
-        {
-          "title": "Pod CPU Usage by %",
-          "type": "graph",
-          "targets": [
-            {
-              "expr": "avg(rate(container_cpu_usage_seconds_total{pod=\"$pod\"}[5m])) by (pod) * 100",
-              "legendFormat": "{{pod}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        },
-        {
-          "title": "Pod Age",
-          "type": "stat",
-          "targets": [
-            {
-              "expr": "time() - kube_pod_start_time{pod=\"$pod\"}",
-              "legendFormat": "{{pod}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        },
-        {
-          "title": "Pod Average Memory Usage",
-          "type": "graph",
-          "targets": [
-            {
-              "expr": "avg(container_memory_usage_bytes{pod=\"$pod\"}) by (pod)",
-              "legendFormat": "{{pod}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        },
-        {
-          "title": "Pod CPU Usage",
-          "type": "graph",
-          "targets": [
-            {
-              "expr": "avg(rate(container_cpu_usage_seconds_total{pod=\"$pod\"}[5m])) by (pod)",
-              "legendFormat": "{{pod}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        },
-        {
-          "title": "Container CPU Usage",
-          "type": "graph",
-          "targets": [
-            {
-              "expr": "sum(rate(container_cpu_usage_seconds_total{container=\"$container\"}[5m])) by (container)",
-              "legendFormat": "{{container}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        },
-        {
-          "title": "Container Memory Usage",
-          "type": "graph",
-          "targets": [
-            {
-              "expr": "sum(container_memory_usage_bytes{container=\"$container\"}) by (container)",
-              "legendFormat": "{{container}}",
-              "datasource": "Prometheus"
-            }
-          ]
-        }
-      ]
-    }
+              "expr": "sum(rate(container_fs_writes_bytes_total{pod=\"$pod\"}[5
