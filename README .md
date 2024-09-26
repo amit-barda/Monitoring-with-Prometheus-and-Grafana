@@ -45,8 +45,8 @@ Ensure you have the following tools installed:
 Clone or download the repository containing the necessary configuration files for the setup:
 
 \`\`\`bash
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/amit-barda/Monitoring-with-Prometheus-and-Grafana.git
+cd Monitoring-with-Prometheus-and-Grafana
 \`\`\`
 
 ### 3. **Install Kind (if necessary)**
@@ -58,7 +58,7 @@ If **Kind** is not installed, the provided script will install it for you.
 Run the Bash script to create a Kind Kubernetes cluster, deploy Prometheus, Grafana, and configure port-forwarding:
 
 \`\`\`bash
-./setup-monitoring.sh
+./setup.sh
 \`\`\`
 
 ## 5. **File Structure**
